@@ -6,9 +6,18 @@ import { ServicesStrip } from "@/components/home/services-strip";
 import { StoryBand } from "@/components/home/story-band";
 import { ProductCard } from "@/components/product-card";
 import { SectionHeading } from "@/components/section-heading";
-import { categories, editorials, newArrivals, weekendEdit } from "@/lib/catalog";
+import { categories, editorials, weekendEdit } from "@/lib/catalog";
+import { getNewArrivals, getProductsBySlugs } from "@/lib/products";
 
-export default function Home() {
+// Stock and catalog changes should show immediately, so render per request.
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const [newArrivals, weekendProducts] = await Promise.all([
+    getNewArrivals(),
+    getProductsBySlugs(weekendEdit.productSlugs),
+  ]);
+
   return (
     <>
       <Hero />
@@ -38,7 +47,7 @@ export default function Home() {
 
       <CollectionRail
         collection={weekendEdit.collection}
-        products={weekendEdit.products}
+        products={weekendProducts}
       />
 
       <ServicesStrip />

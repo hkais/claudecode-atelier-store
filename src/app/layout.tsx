@@ -17,7 +17,7 @@ const serif = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Atelier Store",
+  title: { default: "Atelier Store", template: "%s | Atelier Store" },
   description: "Atelier Store",
 };
 

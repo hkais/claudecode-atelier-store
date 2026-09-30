@@ -1,4 +1,5 @@
-// Sample storefront data for the homepage until products live in the database.
+// Static storefront content and shared product types/helpers.
+// Products, categories and stock live in MySQL; see src/lib/products.ts.
 // Photos are from Unsplash (https://unsplash.com/license).
 
 import { unsplash } from "./unsplash";
@@ -14,8 +15,16 @@ export type Product = {
   category: string;
   /** Price in cents (USD). */
   price: number;
+  /** Primary image, used on cards and first in the product gallery. */
   image: Photo;
+  /** Additional product-page shots, shown after `image`. */
+  gallery?: Photo[];
   badge?: "New" | "Limited";
+  color: string;
+  description: string;
+  details: string[];
+  /** Units available; 0 means sold out. */
+  stock: number;
 };
 
 export type Collection = {
@@ -58,91 +67,15 @@ export const hero = {
   ],
 } satisfies { eyebrow: string; title: string; description: string; images: Photo[] };
 
-export const newArrivals: Product[] = [
-  {
-    slug: "biker-jacket-black-leather",
-    name: "Biker Jacket in Black Leather",
-    category: "Outerwear",
-    price: 245000,
-    badge: "New",
-    image: {
-      src: unsplash("1551028719-00167b16eac5"),
-      alt: "Black leather biker jacket on a hanger",
-    },
-  },
-  {
-    slug: "woven-basket-bag",
-    name: "Woven Basket Bag",
-    category: "Bags",
-    price: 135000,
-    image: {
-      src: unsplash("1590874103328-eac38a683ce7"),
-      alt: "Tan woven basket bag with a leather flap",
-    },
-  },
-  {
-    slug: "chevron-chain-shoulder-bag",
-    name: "Chevron Chain Shoulder Bag",
-    category: "Bags",
-    price: 198000,
-    badge: "Limited",
-    image: {
-      src: unsplash("1566150905458-1bf1fc113f0d"),
-      alt: "Blush leather shoulder bag with a chevron stripe and chain strap",
-    },
-  },
-  {
-    slug: "suede-brogue-sage",
-    name: "Suede Brogue in Sage",
-    category: "Shoes",
-    price: 78000,
-    image: {
-      src: unsplash("1560343090-f0409e92791a"),
-      alt: "Sage green suede brogue on a pale plinth",
-    },
-  },
-  {
-    slug: "baroque-pearl-pendant",
-    name: "Baroque Pearl Pendant",
-    category: "Jewelry",
-    price: 62000,
-    badge: "New",
-    image: {
-      src: unsplash("1611085583191-a3b181a88401"),
-      alt: "Fine gold chain with a single pearl pendant worn over a white shirt",
-    },
-  },
-  {
-    slug: "round-metal-sunglasses",
-    name: "Round Metal Sunglasses",
-    category: "Accessories",
-    price: 45000,
-    image: {
-      src: unsplash("1511499767150-a48a237f0083"),
-      alt: "Round gold-frame sunglasses with green lenses on marble",
-    },
-  },
-  {
-    slug: "technical-bomber-cognac",
-    name: "Technical Bomber in Cognac",
-    category: "Outerwear",
-    price: 165000,
-    image: {
-      src: unsplash("1591047139829-d91aecb6caea"),
-      alt: "Cognac bomber jacket held up on a hanger",
-    },
-  },
-  {
-    slug: "grained-leather-satchel",
-    name: "Grained Leather Satchel",
-    category: "Bags",
-    price: 145000,
-    image: {
-      src: unsplash("1605733513597-a8f8341084e6"),
-      alt: "Dove grey leather satchel with buckled straps",
-    },
-  },
-];
+export const LOW_STOCK_THRESHOLD = 3;
+
+export type StockStatus = "in-stock" | "low-stock" | "sold-out";
+
+export function getStockStatus(stock: number): StockStatus {
+  if (stock <= 0) return "sold-out";
+  if (stock <= LOW_STOCK_THRESHOLD) return "low-stock";
+  return "in-stock";
+}
 
 export const editorials: Collection[] = [
   {
@@ -213,7 +146,7 @@ export const story = {
   },
 } satisfies { eyebrow: string; title: string; description: string; image: Photo };
 
-export const weekendEdit: { collection: Collection; products: Product[] } = {
+export const weekendEdit: { collection: Collection; productSlugs: string[] } = {
   collection: {
     slug: "weekend",
     eyebrow: "The Edit",
@@ -224,57 +157,12 @@ export const weekendEdit: { collection: Collection; products: Product[] } = {
       alt: "Rail of cream and camel knitwear beside dried pampas grass",
     },
   },
-  products: [
-    {
-      slug: "crochet-cotton-poncho",
-      name: "Crochet Cotton Poncho",
-      category: "Knitwear",
-      price: 110000,
-      image: {
-        src: unsplash("1434389677669-e08b4cac3105"),
-        alt: "Cream crochet poncho with fringed hem on a hanger",
-      },
-    },
-    {
-      slug: "silk-jogger-blush",
-      name: "Silk Jogger in Blush",
-      category: "Trousers",
-      price: 72000,
-      image: {
-        src: unsplash("1594633312681-425c7b97ccd1"),
-        alt: "Blush silk jogger trousers with cuffed ankles",
-      },
-    },
-    {
-      slug: "cotton-jersey-tee-sage",
-      name: "Cotton Jersey T-Shirt",
-      category: "Tops",
-      price: 39000,
-      image: {
-        src: unsplash("1523381210434-271e8be1f52b"),
-        alt: "Sage cotton T-shirts hanging on wooden hangers",
-      },
-    },
-    {
-      slug: "canvas-backpack-navy",
-      name: "Canvas Backpack in Navy",
-      category: "Bags",
-      price: 98000,
-      image: {
-        src: unsplash("1553062407-98eeb64c6a62"),
-        alt: "Navy canvas backpack standing on a pale floor",
-      },
-    },
-    {
-      slug: "bifold-wallet-cognac",
-      name: "Bifold Wallet in Cognac",
-      category: "Small Leather Goods",
-      price: 42000,
-      image: {
-        src: unsplash("1627123424574-724758594e93"),
-        alt: "Cognac leather bifold wallet suspended in the air",
-      },
-    },
+  productSlugs: [
+    "crochet-cotton-poncho",
+    "silk-jogger-blush",
+    "cotton-jersey-tee-sage",
+    "canvas-backpack-navy",
+    "bifold-wallet-cognac",
   ],
 };
 

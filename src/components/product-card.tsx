@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { formatPrice, type Product } from "@/lib/catalog";
+import { formatPrice, getStockStatus, type Product } from "@/lib/catalog";
 
 type ProductCardProps = {
   product: Product;
@@ -13,6 +13,9 @@ export function ProductCard({
   product,
   sizes = "(min-width: 80rem) 25vw, (min-width: 48rem) 33vw, 50vw",
 }: ProductCardProps) {
+  const badge =
+    getStockStatus(product.stock) === "sold-out" ? "Sold Out" : product.badge;
+
   return (
     <article className="group relative">
       <div className="media-product">
@@ -23,9 +26,9 @@ export function ProductCard({
           sizes={sizes}
           className="transition-transform duration-700 group-hover:scale-[1.03]"
         />
-        {product.badge ? (
+        {badge ? (
           <span className="type-eyebrow absolute top-3 left-3 bg-paper px-2 py-1">
-            {product.badge}
+            {badge}
           </span>
         ) : null}
       </div>
