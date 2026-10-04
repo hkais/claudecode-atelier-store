@@ -13,6 +13,8 @@ export type Product = {
   slug: string;
   name: string;
   category: string;
+  /** URL key of the category page: /[categorySlug]. */
+  categorySlug: string;
   /** Price in cents (USD). */
   price: number;
   /** Primary image, used on cards and first in the product gallery. */

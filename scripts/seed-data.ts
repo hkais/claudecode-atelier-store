@@ -5,7 +5,8 @@
 import type { Product } from "../src/lib/catalog";
 import { unsplash } from "../src/lib/unsplash";
 
-export const seedProducts: Product[] = [
+// `categorySlug` is derived from the category name by seed.ts.
+export const seedProducts: Omit<Product, "categorySlug">[] = [
   {
     slug: "biker-jacket-black-leather",
     name: "Biker Jacket in Black Leather",

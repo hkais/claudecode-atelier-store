@@ -44,7 +44,11 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
               </Link>
             </li>
             <li aria-hidden="true">/</li>
-            <li>{product.category}</li>
+            <li>
+              <Link href={`/${product.categorySlug}`} className="link-reveal hover:text-ink">
+                {product.category}
+              </Link>
+            </li>
             <li aria-hidden="true">/</li>
             <li aria-current="page" className="text-ink">
               {product.name}

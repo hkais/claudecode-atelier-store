@@ -3,14 +3,14 @@ import "server-only";
 import { and, asc, desc, eq, inArray, ne } from "drizzle-orm";
 
 import { db } from "@/db";
-import { productImages, products } from "@/db/schema";
+import { categories, productImages, products } from "@/db/schema";
 
 import type { Product } from "./catalog";
 
 const BADGES = { new: "New", limited: "Limited" } as const;
 
 type ProductRow = typeof products.$inferSelect & {
-  category: { name: string };
+  category: { name: string; slug: string };
   images: { src: string; alt: string }[];
 };
 
@@ -28,6 +28,7 @@ function toProduct(row: ProductRow): Product {
     slug: row.slug,
     name: row.name,
     category: row.category.name,
+    categorySlug: row.category.slug,
     price: row.priceCents,
     image,
     gallery: gallery.length > 0 ? gallery : undefined,
@@ -55,6 +56,35 @@ export async function getNewArrivals(limit = 8) {
     limit,
   });
   return rows.map(toProduct);
+}
+
+/** Categories that have at least one product, alphabetical. */
+export async function getCategories() {
+  const rows = await db.query.categories.findMany({
+    with: { products: { columns: { id: true }, limit: 1 } },
+    orderBy: asc(categories.name),
+  });
+  return rows
+    .filter((row) => row.products.length > 0)
+    .map(({ slug, name }) => ({ slug, name }));
+}
+
+/** A category and its products, newest first; undefined for an unknown slug. */
+export async function getCategoryWithProducts(slug: string) {
+  const category = await db.query.categories.findFirst({
+    where: eq(categories.slug, slug),
+  });
+  if (!category) return undefined;
+
+  const rows = await db.query.products.findMany({
+    where: eq(products.categoryId, category.id),
+    with: withRelations,
+    orderBy: desc(products.createdAt),
+  });
+  return {
+    category: { slug: category.slug, name: category.name },
+    products: rows.map(toProduct),
+  };
 }
 
 /** Returns products in the order of `slugs`; unknown slugs are skipped. */

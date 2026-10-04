@@ -7,11 +7,14 @@ type ProductCardProps = {
   product: Product;
   /** `sizes` for next/image; defaults to the grid-products column widths. */
   sizes?: string;
+  /** Preload the image; use for above-the-fold cards. */
+  priority?: boolean;
 };
 
 export function ProductCard({
   product,
   sizes = "(min-width: 80rem) 25vw, (min-width: 48rem) 33vw, 50vw",
+  priority = false,
 }: ProductCardProps) {
   const badge =
     getStockStatus(product.stock) === "sold-out" ? "Sold Out" : product.badge;
@@ -24,6 +27,7 @@ export function ProductCard({
           alt={product.image.alt}
           fill
           sizes={sizes}
+          priority={priority}
           className="transition-transform duration-700 group-hover:scale-[1.03]"
         />
         {badge ? (
